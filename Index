@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piano Virtual para Makey Makey con Sonido</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f0f0f0; }
+        .piano { position: relative; width: 560px; height: 200px; background-color: #333; border-radius: 10px; overflow: hidden; }
+        .tecla { position: absolute; height: 100%; width: 80px; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 10px; box-sizing: border-box; transition: background-color 0.1s; }
+        .blanca { background-color: white; color: black; z-index: 1; }
+        .negra { background-color: black; color: white; height: 60%; width: 50px; z-index: 2; }
+        .activa { background-color: #add8e6; }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Piano Virtual para Makey Makey con Sonido</h1>
+        <div class="piano" id="piano"></div>
+        <p>Usa las teclas A, S, D, F, G, H, J para las notas blancas, y W, E, T, Y, U para las negras.</p>
+    </div>
+
+    <script>
+        const notas = [
+            { tecla: 'a', nota: 'C', color: 'blanca', posicion: 0, sonido: 'C' },
+            { tecla: 'w', nota: 'C#', color: 'negra', posicion: 50, sonido: 'Cs' },
+            { tecla: 's', nota: 'D', color: 'blanca', posicion: 80, sonido: 'D' },
+            { tecla: 'e', nota: 'D#', color: 'negra', posicion: 130, sonido: 'Ds' },
+            { tecla: 'd', nota: 'E', color: 'blanca', posicion: 160, sonido: 'E' },
+            { tecla: 'f', nota: 'F', color: 'blanca', posicion: 240, sonido: 'F' },
+            { tecla: 't', nota: 'F#', color: 'negra', posicion: 290, sonido: 'Fs' },
+            { tecla: 'g', nota: 'G', color: 'blanca', posicion: 320, sonido: 'G' },
+            { tecla: 'y', nota: 'G#', color: 'negra', posicion: 370, sonido: 'Gs' },
+            { tecla: 'h', nota: 'A', color: 'blanca', posicion: 400, sonido: 'A' },
+            { tecla: 'u', nota: 'A#', color: 'negra', posicion: 450, sonido: 'As' },
+            { tecla: 'j', nota: 'B', color: 'blanca', posicion: 480, sonido: 'B' }
+        ];
+
+        const piano = document.getElementById('piano');
+
+        notas.forEach(nota => {
+            const tecla = document.createElement('div');
+            tecla.className = `tecla ${nota.color}`;
+            tecla.style.left = `${nota.posicion}px`;
+            tecla.textContent = nota.nota;
+            tecla.id = nota.tecla;
+            piano.appendChild(tecla);
+
+            // Crear elemento de audio para cada nota
+            const audio = document.createElement('audio');
+            audio.src = `https://carolinegabriel.com/demo/js-keyboard/sounds/piano/${nota.sonido}.mp3`;
+            audio.id = `audio-${nota.tecla}`;
+            document.body.appendChild(audio);
+        });
+
+        function playNote(key) {
+            const audio = document.getElementById(`audio-${key}`);
+            const tecla = document.getElementById(key);
+            if (audio && tecla) {
+                audio.currentTime = 0; // Reinicia el audio si ya estaba sonando
+                audio.play();
+                tecla.classList.add('activa');
+            }
+        }
+
+        function stopNote(key) {
+            const tecla = document.getElementById(key);
+            if (tecla) {
+                tecla.classList.remove('activa');
+            }
+        }
+
+        document.addEventListener('keydown', (evento) => {
+            if (!evento.repeat) { // Evita que se repita el sonido al mantener presionada la tecla
+                playNote(evento.key.toLowerCase());
+            }
+        });
+
+        document.addEventListener('keyup', (evento) => {
+            stopNote(evento.key.toLowerCase());
+        });
+    </script>
+</body>
+</html>
